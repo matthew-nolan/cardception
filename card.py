@@ -10,7 +10,7 @@ class Card(object):
 		self.card_type = ""
 		self.description = ""
 		self.estimate = 0
-		self.testimate_type = ""
+		self.estimate_type = ""
 		self.tags = []
 		self.watchers = []
 		self.assignee = ""
@@ -80,7 +80,7 @@ class Card(object):
 		"name": self.name,
 		"id": self.id,
 		"estimate": self.estimate,
-		"estimate-type": self.estimate_type,
+		"estimate_type": self.estimate_type,
 		"card_type": self.type,
 		"description": self.description,
 		"estimate": self.estimate,
