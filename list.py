@@ -6,8 +6,17 @@ class List(object):
 
 	def __init__(self, name):
 		self.name = name
+		self.board_name = ""
 		# a list of cards or separatators
 		self.items = []
+
+	def getDocument(self):
+		document = {
+			"name": self.name,
+			"items": self.items
+		}
+
+		return document
 
 	def addCard(self, card):
 		self.items.append(card)

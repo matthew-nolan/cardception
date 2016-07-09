@@ -21,3 +21,12 @@ class Board(object):
 			if self.lists[i] == list_name:
 				ret = i
 		return ret
+
+	def getDocument(self):
+		document = {
+			"name": self.name,
+			"description": self.description,
+			"lists": self.lists
+		}
+
+		return document

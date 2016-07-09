@@ -4,6 +4,7 @@ import list as l
 import project as p
 import separator as s
 import organization as o
+import db
 import sys
 from pymongo import MongoClient
 
@@ -29,8 +30,16 @@ def runTestSuite():
 
 
 	# Functionality of the MongoDB Database
+	canCreateDB()
+	canAddProjectToDB()
+	canAddBoardToDB()
+	canAddListToDB()
 	canAddCardToDB()
 	canEditCardData()
+	canDeleteProjectFromDB()
+	canDeleteBoardFromDB()
+	canDeleteCardFromDB()
+
 
     # Functionality of an organization
 	canCreateOrganization()
@@ -38,6 +47,7 @@ def runTestSuite():
 	# Functionality of a project
 	canCreateProject()
 	canAddBoardToProject()
+	canGetProjectDocument()
 	#canGetListOfBoardNames()
 
 	# Functionality of a Board
@@ -59,7 +69,7 @@ def runTestSuite():
 	# Functionality of a Card
 	canCreateCard()
 	canGetDocument()
-	canGetCardUniqueID()
+	#canGetCardUniqueID()
 	canAssignCardAttributes()
 	canAssignCardRelationship()
 
@@ -121,7 +131,10 @@ def createTestOrganization(*num_orgs):
 
 def createTestProject(*num_projects):
 	if len(num_projects) == 0:
-		ret = p.Project("test_project")
+		project = p.Project("test_project")
+		project.description = "This is a test project"
+		ret = project
+
 	else:
 		ret = []
 		for i in range(num_projects[0]):
@@ -130,7 +143,8 @@ def createTestProject(*num_projects):
 	return ret
 
 def createTestBoard():
-	board = b.Board("test")
+	board = b.Board("test_board")
+	board.addDescription("This is the description for test_board")
 	return board
 
 def createTestCard(*num_cards):
@@ -146,6 +160,7 @@ def createTestCard(*num_cards):
 		ret.type = "Task"
 		ret.description = "This is the ret description"
 		ret.estimate = "4"
+		ret.estimate_type = "story points"
 		ret.tags.append("OEM")
 		ret.watchers.append("Stephen")
 		ret.assignee = "Matt"
@@ -204,6 +219,15 @@ def createTestSeparator():
 	separator = s.Separator("test")
 	return separator
 
+def createTestDB(*name):
+	if len(name) == 0:
+		client = MongoClient()
+		db = client.test_db
+	else:
+		client = MongoClient()
+		db = client.name
+	return db
+
 def canary():
 	print "*!*!*! Canary *!*!*!"
 
@@ -213,6 +237,58 @@ def canary():
 #  Tests for Database Objects	      #
 #									  #
 #######################################
+
+def canCreateDB():
+	test_name = "Database: Can create a database"
+
+	try:
+		client = MongoClient()
+		db = client.CardCeption
+		passTest(test_name)
+	except:
+		failTest(test_name, sys.exc_info()[1])
+
+def canAddProjectToDB():
+	test_name = "Database: Can add project to database"
+
+	try:
+		database = createTestDB()
+		project = createTestProject()
+		db.add(project, database, "projects")
+
+		passTest(test_name)
+	except:
+		failTest(test_name, sys.exc_info()[1])
+
+def canAddBoardToDB():
+	test_name = "Database: Can add board to DB"
+
+	try:
+		database = createTestDB()
+		board = createTestBoard()
+		db.add(board,database,"boards")
+
+		passTest(test_name)
+	except:
+		failTest(test_name, sys.exc_info()[1])
+
+def canAddListToDB():
+	test_name = "Database: Can add List to document of its board"
+
+	try:
+		database = createTestDB()
+		board = createTestBoard()
+		db.add(board,database,"boards")
+
+		list = createTestList()
+		list.board_name = board.name
+
+		db.add(list,database,"boards")
+
+		passTest(test_name)
+
+	except:
+		failTest(test_name, sys.exc_info()[1])
 
 def canAddCardToDB():
 	test_name = "Database: Can add a card object to the DB"
@@ -237,7 +313,7 @@ def canEditCardData():
 		card = createTestCard()
 		client = MongoClient()
 		db = client.cardCeption
-		result = db.cards.insert_one(card.getDocument())
+		result = db.cardCeption.insert_one(card.getDocument())
 
 		db.cardCeption.update_one(
 			{"name": card.name},
@@ -251,6 +327,71 @@ def canEditCardData():
 	except:
 		failTest(test_name, sys.exc_info()[1])
 
+def canDeleteProjectFromDB():
+	test_name = "Database: Delete a project from the collection"
+
+	try:
+		database = createTestDB()
+		project = createTestProject()
+
+		db.add(project, database, "projects")
+		db.delete(project,database,"projects")
+
+		passTest(test_name)
+
+	except:
+		failTest(test_name, sys.exc_info()[1])
+
+def canDeleteBoardFromDB():
+	test_name = "Database: Delete a board from the collection"
+
+	try:
+		database = createTestDB()
+		board = createTestBoard()
+		db.add(board,database,"boards")
+
+		db.delete(board,database,"boards")
+		passTest(test_name)
+	except:
+		failTest(test_name, sys.exc_info()[1])
+
+def canDeleteCardFromDB():
+	test_name = "Database: Delete a card from the collection"
+
+	try:
+		database = createTestDB()
+		card = createTestCard()
+		db.add(card,database,"items")
+
+		db.delete(card,database,"items")
+		passTest(test_name)
+	except:
+		failTest(test_name, sys.exc_info()[1])
+
+
+# TO DO
+
+def canEditOrgData():
+	test_name = "Database: Can edit an organization object in the DB"
+
+	try:
+		org = createTestOrganization()
+		db = createTestDB()
+
+		db.test_db.insert_one(org.getDocument())
+
+		db.test_db.update_one(
+
+
+		)
+
+
+		passTest(test_name)
+	except:
+		failTest(test_name, sys.exc_info()[1])
+def checkBoardIDAddedToProjectDocument():
+	test_name = "Database: When a board is added to a collection, \
+	its ID should be added to its project's document"
 
 
 #######################################
@@ -298,6 +439,16 @@ def canAddBoardToProject():
 			failTest("Add a board to a Project", "Reason Unknown")
 	except:
 			failTest("Add a Board to a Project", sys.exc_info()[1])
+
+def canGetProjectDocument():
+	test_name = "Project: Get MongoDB Document for a Project"
+
+	test_project = createTestProject()
+	try:
+		test_project.getDocument()
+		passTest(test_name)
+	except:
+		failTest(test_name, sys.exc_info()[1])
 
 # TO DO
 
