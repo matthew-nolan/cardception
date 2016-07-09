@@ -1,7 +1,6 @@
 import board as b
 import list as l
 import card as c
-# from pymongo import MongoClient
 
 
 class Project(object):
@@ -9,8 +8,10 @@ class Project(object):
 	def __init__(self, name):
 		self.name = name
 		self.boards = []
-		self.cards = []
+		# self.cards = []
 		self.description = ""
+		self.start_date = ""
+		self.end_date = ""
 		self.prefix = self.name[0:3].upper()
 
 	def addBoard(self, board_name):
@@ -24,4 +25,13 @@ class Project(object):
 		return ret
 
 
-# client = MongoClient()
+	def getDocument(self):
+
+		document = {
+		"name": self.name,
+		"boards": self.boards,
+		"description": self.description,
+		"prefix": self.prefix
+		}
+
+		return document
