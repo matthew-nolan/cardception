@@ -1,7 +1,6 @@
 import board as b
 import list as l
 import card as c
-from pymongo import MongoClient
 
 
 class Project(object):
