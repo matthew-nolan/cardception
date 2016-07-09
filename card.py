@@ -81,7 +81,7 @@ class Card(object):
 		"id": self.id,
 		"estimate": self.estimate,
 		"estimate_type": self.estimate_type,
-		"card_type": self.type,
+		"card_type": self.card_type,
 		"description": self.description,
 		"estimate": self.estimate,
 		"tags": self.tags,
